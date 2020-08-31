@@ -17,6 +17,7 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -58,7 +59,7 @@ public class KafkaReceiver {
         return factory;
     }
 
-    @PostMapping("/consumer")
+    @GetMapping("/consumer")
     public void consumer(){
         List<Map<String, String>> list;
         Map<String, String> map;
