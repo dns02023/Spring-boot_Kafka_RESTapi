@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,23 +34,26 @@ public class KafkaSender {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return props;
     }
 
     @Bean
-    public ProducerFactory<String, String> producerFactory(){
+    public ProducerFactory<String, Course> producerFactory(){
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
     @Bean
-    public KafkaTemplate<String, String> kafkaTemplate(){
+    public KafkaTemplate<String, Course> kafkaTemplate(){
         return new KafkaTemplate<>(producerFactory());
     }
 
     @PostMapping("/send")
-    public void sender(@RequestBody String msg){
-        log.info("sending to kafka : {}", msg);
-        kafkaTemplate().send(topic, msg);
+    public void sender(@RequestBody Map<String, Object> param){
+        log.info("sending to kafka : {}", param);
+        int id = (int) param.get("id");
+        String name = (String) param.get("name");
+        String professor = (String) param.get("professor");
+        kafkaTemplate().send(topic, new Course(id, name, professor));
     }
 }
